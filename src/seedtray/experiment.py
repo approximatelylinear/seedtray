@@ -1,9 +1,11 @@
 from dataclasses import asdict
 from uuid import uuid4
 import functools
+import random
 
 import wandb
 
+from seedtray.config_types import RunConfig
 
 class Metric:
   def __init__(self, name, func):

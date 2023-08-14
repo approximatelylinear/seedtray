@@ -6,7 +6,7 @@ from seedtray.experiment import Experiment
 from seedtray.config_types import (
   ModelConfig, DataConfig, OptimizerConfig, TrainingConfig, ExperimentConfig
 )
-from seedtray.data_loader import load_data, data_stats, APPLICATION_TORCHVISION
+from seedtray.data_loader import load_data, APPLICATION_TORCHVISION
 
 experiment = Experiment()
 
@@ -27,7 +27,7 @@ def train(data_name, data_path, data_download=True):
   print(train_data)
 
 
-if __name__ == '__main__':
+def main():
   experiment_name = 'Hello World'
   project_id = 'Hello World'
   model_config = ModelConfig('resnet18', {})
@@ -43,3 +43,6 @@ if __name__ == '__main__':
     experiment_name, model_config, data_config, training_config, project_id)
   experiment.configure(experiment_config)
   experiment.run()
+
+if __name__ == '__main__':
+  main()
