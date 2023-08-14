@@ -11,7 +11,7 @@ IMAGE_WEBP = "image/webp"
 TEXT_PLAIN = "text/plain"
 TEXT_HTML = "text/html"
 
-types = [
+MIME_TYPES = [
   APPLICATION_TORCHVISION,
   APPLICATION_HUGGINGFACE,
   IMAGE_HEIC,

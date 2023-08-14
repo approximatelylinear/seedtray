@@ -2,6 +2,12 @@ from importlib import import_module
 from uuid import uuid4
 import random
 
+from seedtray.experiment import Experiment
+from seedtray.config_types import (
+  ModelConfig, DataConfig, OptimizerConfig, TrainingConfig, ExperimentConfig
+)
+from seedtray.data_loader import load_data, data_stats, APPLICATION_TORCHVISION
+
 experiment = Experiment()
 
 @experiment.add_metric('accuracy')
@@ -15,9 +21,10 @@ def loss(epoch, offset):
 
 
 def train(data_name, data_path, data_download=True):
-  train_data, test_data = load_torchvision_data(data_name, data_path, data_download)
+  train_data, test_data = load_data(
+    data_name, data_path, data_download=True, mimetype=APPLICATION_TORCHVISION
+  )
   print(train_data)
-  print(data_stats(train_data))
 
 
 if __name__ == '__main__':
