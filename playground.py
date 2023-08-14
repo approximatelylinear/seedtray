@@ -6,13 +6,11 @@ experiment = Experiment()
 
 @experiment.add_metric('accuracy')
 def accuracy(epoch, offset):
-  # return (preds == targets).mean()
   return 1 - 2 ** -epoch - random.random() / epoch - offset
 
 
 @experiment.add_loss('loss')
 def loss(epoch, offset):
-  # return (preds == targets).mean()
   return 2 ** -epoch + random.random() / epoch + offset
 
 
