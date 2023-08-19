@@ -6,6 +6,7 @@ import random
 import wandb
 
 from seedtray.config_types import RunConfig
+from seedtray.data_loader import load_data
 
 class Metric:
   def __init__(self, name, func):
@@ -25,14 +26,34 @@ class Loss:
     return self.func(*args, **kwargs)
 
 
+class DataTransform:
+  def __init__(self, name, func):
+    self.name = name
+    self.func = func
+
+
 class ExperimentRun:
-  def __init__(self, project, config, metrics, loss_funcs):
+  def __init__(self, project, config, metrics, loss_funcs, data_transforms=None):
+    if transforms is None:
+      transforms = []
     self.project = project
     self.config = config
     self.metrics = metrics
     self.loss_funcs = loss_funcs
+    self.data_transforms = data_transforms
+
+  def load_data(self):
+    return load_data(
+        data_name=self.config.data.name,
+        data_path=self.config.data.path,
+        data_download=self.config.data.download,
+        mimetype=self.config.data.mimetype,
+        data_loader=self.config.data.loader,
+        data_transforms=self.data_transforms
+      )
 
   def run(self):
+    data = self.load_data()
     epochs = self.config.training.epochs
     offset = random.random() / 5
     for epoch in range(2, epochs):
@@ -56,6 +77,7 @@ class Experiment:
     self.metrics = []
     self.loss_funcs = []
     self.runs = []
+    self.data_transforms = []
 
   def configure(self, config):
     self.config = config
@@ -67,12 +89,19 @@ class Experiment:
       config=asdict(config),
     )
 
+  def add_data_transform(self, name="transform"):
+    def decorator(func):
+      @functools.wraps(func)
+      def wrapper(func):
+        self.metrics.append(DataTransform(name, func))
+      return wrapper
+    return decorator
+
   def add_metric(self, name):
     def decorator(func):
       @functools.wraps(func)
       def wrapper(func):
-        metric = Metric(name, func)
-        self.metrics.append(metric)
+        self.metrics.append(Metric(name, func))
       return wrapper
     return decorator
 
@@ -80,8 +109,7 @@ class Experiment:
     def decorator(func):
       @functools.wraps(func)
       def wrapper(func):
-        metric = Metric(name, func)
-        self.loss_funcs.append(metric)
+        self.loss_funcs.append(Loss(name, func))
       return wrapper
     return decorator
 
