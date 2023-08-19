@@ -6,9 +6,23 @@ from seedtray.experiment import Experiment
 from seedtray.config_types import (
   ModelConfig, DataConfig, OptimizerConfig, TrainingConfig, ExperimentConfig
 )
-from seedtray.data_loader import load_data, APPLICATION_TORCHVISION
+from seedtray.data_loader import APPLICATION_TORCHVISION
 
 experiment = Experiment()
+
+
+@experiment.add_data_transform('normalize')
+def normalize(data):
+  from torchvision import transforms
+  return transforms.Compose([
+    transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize(
+      mean=[0.485, 0.456, 0.406],
+      std=[0.225, 0.225, 0.225]
+    )
+  ])
 
 @experiment.add_metric('accuracy')
 def accuracy(epoch, offset):
@@ -20,18 +34,11 @@ def loss(epoch, offset):
   return 2 ** -epoch + random.random() / epoch + offset
 
 
-def train(data_name, data_path, data_download=True):
-  train_data, test_data = load_data(
-    data_name, data_path, data_download=True, mimetype=APPLICATION_TORCHVISION
-  )
-  print(train_data)
-
-
 def main():
   experiment_name = 'Hello World'
   project_id = 'Hello World'
   model_config = ModelConfig('resnet18', {})
-  data_config = DataConfig('CIFAR10', './data', True)
+  data_config = DataConfig('CIFAR10', './data', True, mimetype=APPLICATION_TORCHVISION)
   optimizer_config = OptimizerConfig('Adam', {})
   training_config = TrainingConfig(
     epochs=10,
